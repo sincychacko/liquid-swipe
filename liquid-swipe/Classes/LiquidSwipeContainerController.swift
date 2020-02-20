@@ -67,6 +67,7 @@ open class LiquidSwipeContainerController: UIViewController {
     private var rightEdgeGesture = UIScreenEdgePanGestureRecognizer()
     private var leftEdgeGesture = UIScreenEdgePanGestureRecognizer()
     private var rightSwipeGesture = UISwipeGestureRecognizer()
+    private var leftSwipeGesture = UISwipeGestureRecognizer()
     
     private var csBtnNextLeading: NSLayoutConstraint?
     private var csBtnNextCenterY: NSLayoutConstraint?
@@ -104,6 +105,11 @@ open class LiquidSwipeContainerController: UIViewController {
         rightSwipeGesture.addTarget(self, action: #selector(btnTapped))
         rightSwipeGesture.direction = .left
         view.addGestureRecognizer(rightSwipeGesture)
+        
+        leftSwipeGesture.addTarget(self, action: #selector(leftEdgePan))
+        leftSwipeGesture.direction = .right
+        view.addGestureRecognizer(leftSwipeGesture)
+        leftSwipeGesture.isEnabled = false
     }
     
     private func animate(view: UIView, forProgress progress: CGFloat, waveCenterY: CGFloat? = nil) {
@@ -224,7 +230,7 @@ open class LiquidSwipeContainerController: UIViewController {
         }
     }
     
-    @objc private func leftEdgePan(_ sender: UIPanGestureRecognizer) {
+    @objc private func leftEdgePan(_ sender: UIGestureRecognizer) {
         guard !animating else {
             return
         }
@@ -250,7 +256,7 @@ open class LiquidSwipeContainerController: UIViewController {
                 let direction: CGFloat = (gesture.location(in: view).y - mask.waveCenterY).sign == .plus ? 1 : -1
                 let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
                 let centerY = mask.waveCenterY + distance * direction
-                let change = gesture.translation(in: view).x
+                let change = (gesture as? UIPanGestureRecognizer)?.translation(in: view).x ?? 0.9
                 let maxChange: CGFloat = self.view.bounds.width
                 if !(self.shouldFinish || self.shouldCancel) {
                     let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
@@ -409,6 +415,7 @@ open class LiquidSwipeContainerController: UIViewController {
         currentViewController = nextViewController
         currentPageIndex += 1
         leftEdgeGesture.isEnabled = true
+        leftSwipeGesture.isEnabled = true
         let maskLayer = WaveLayer(waveCenterY: initialWaveCenter,
                                   waveHorRadius: 0,
                                   waveVertRadius: initialVertRadius,
@@ -475,6 +482,7 @@ open class LiquidSwipeContainerController: UIViewController {
             apply(mask: maskLayer, on: prevPage)
         } else {
             leftEdgeGesture.isEnabled = false
+            leftSwipeGesture.isEnabled = false
         }
         let startTime = CACurrentMediaTime()
         let duration: CFTimeInterval = 0.3
@@ -538,6 +546,7 @@ open class LiquidSwipeContainerController: UIViewController {
         guard currentPageIndex > 0 && pagesCount > 0 else {
             previousViewController = nil
             leftEdgeGesture.isEnabled = false
+            leftSwipeGesture.isEnabled = false
             return
         }
         let previousVC = datasource.liquidSwipeContainer(self, viewControllerAtIndex: currentPageIndex - 1)
