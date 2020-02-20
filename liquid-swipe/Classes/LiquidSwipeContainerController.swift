@@ -600,7 +600,7 @@ open class LiquidSwipeContainerController: UIViewController {
         currentPage?.pop_add(animation, forKey: "animation")
     }
     
-    @objc private func handleRightSwipe(_ sender: UIGestureRecognizer) {
+    @objc private func handleRightSwipe(_ sender: UISwipeGestureRecognizer) {
         guard !animating else {
             return
         }
@@ -625,7 +625,7 @@ open class LiquidSwipeContainerController: UIViewController {
                 let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
                 let centerY = mask.waveCenterY + distance * direction
                 
-                let change: CGFloat = 0.7
+                let change: CGFloat = self.view.bounds.width
                 let maxChange: CGFloat = self.view.bounds.width
                 let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
                 self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
