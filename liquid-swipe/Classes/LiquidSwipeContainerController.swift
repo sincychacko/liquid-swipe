@@ -66,6 +66,7 @@ open class LiquidSwipeContainerController: UIViewController {
     
     private var rightEdgeGesture = UIScreenEdgePanGestureRecognizer()
     private var leftEdgeGesture = UIScreenEdgePanGestureRecognizer()
+    private var rightSwipeGesture = UISwipeGestureRecognizer()
     
     private var csBtnNextLeading: NSLayoutConstraint?
     private var csBtnNextCenterY: NSLayoutConstraint?
@@ -99,6 +100,10 @@ open class LiquidSwipeContainerController: UIViewController {
         leftEdgeGesture.edges = .left
         view.addGestureRecognizer(leftEdgeGesture)
         leftEdgeGesture.isEnabled = false
+        
+        rightSwipeGesture.addTarget(self, action: #selector(btnTapped))
+        rightSwipeGesture.direction = .left
+        view.addGestureRecognizer(rightSwipeGesture)
     }
     
     private func animate(view: UIView, forProgress progress: CGFloat, waveCenterY: CGFloat? = nil) {
@@ -416,6 +421,7 @@ open class LiquidSwipeContainerController: UIViewController {
         guard nextViewController != nil else {
             btnNext.isHidden = true
             rightEdgeGesture.isEnabled = false
+            rightSwipeGesture.isEnabled = false
             if let viewController = currentViewController {
                 delegate?.liquidSwipeContainer(self, didFinishTransitionTo: viewController, transitionCompleted: true)
             }
@@ -458,6 +464,7 @@ open class LiquidSwipeContainerController: UIViewController {
         currentPageIndex -= 1
         btnNext.isHidden = false
         rightEdgeGesture.isEnabled = true
+        rightSwipeGesture.isEnabled = true
         let maskLayer = WaveLayer(waveCenterY: initialWaveCenter,
                                   waveHorRadius: 0,
                                   waveVertRadius: maxVertRadius,
@@ -503,6 +510,7 @@ open class LiquidSwipeContainerController: UIViewController {
         guard pagesCount > currentPageIndex + 1 else {
             nextViewController = nil
             rightEdgeGesture.isEnabled = false
+            rightSwipeGesture.isEnabled = false
             return
         }
         let nextVC = datasource.liquidSwipeContainer(self, viewControllerAtIndex: currentPageIndex + 1)
