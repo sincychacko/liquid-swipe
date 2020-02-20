@@ -106,7 +106,7 @@ open class LiquidSwipeContainerController: UIViewController {
         rightSwipeGesture.direction = .left
         view.addGestureRecognizer(rightSwipeGesture)
         
-        leftSwipeGesture.addTarget(self, action: #selector(handleRightSwipe))
+        leftSwipeGesture.addTarget(self, action: #selector(leftEdgePan))
         leftSwipeGesture.direction = .right
         view.addGestureRecognizer(leftSwipeGesture)
         leftSwipeGesture.isEnabled = false
@@ -230,7 +230,7 @@ open class LiquidSwipeContainerController: UIViewController {
         }
     }
     
-    @objc private func leftEdgePan(_ sender: UIPanGestureRecognizer) {
+    @objc private func leftEdgePan(_ sender: UIGestureRecognizer) {
         guard !animating else {
             return
         }
@@ -256,8 +256,8 @@ open class LiquidSwipeContainerController: UIViewController {
                 let direction: CGFloat = (gesture.location(in: view).y - mask.waveCenterY).sign == .plus ? 1 : -1
                 let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
                 let centerY = mask.waveCenterY + distance * direction
-                let change = gesture.translation(in: view).x
                 let maxChange: CGFloat = self.view.bounds.width
+                let change = (gesture as? UIPanGestureRecognizer)?.translation(in: view).x ?? maxChange
                 if !(self.shouldFinish || self.shouldCancel) {
                     let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
                     self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
