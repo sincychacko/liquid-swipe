@@ -106,7 +106,7 @@ open class LiquidSwipeContainerController: UIViewController {
         rightSwipeGesture.direction = .left
         view.addGestureRecognizer(rightSwipeGesture)
         
-        leftSwipeGesture.addTarget(self, action: #selector(handleRightSwipe))
+        leftSwipeGesture.addTarget(self, action: #selector(leftEdgePan))
         leftSwipeGesture.direction = .right
         view.addGestureRecognizer(leftSwipeGesture)
         leftSwipeGesture.isEnabled = false
@@ -230,7 +230,7 @@ open class LiquidSwipeContainerController: UIViewController {
         }
     }
     
-    @objc private func leftEdgePan(_ sender: UIPanGestureRecognizer) {
+    @objc private func leftEdgePan(_ sender: UIGestureRecognizer) {
         guard !animating else {
             return
         }
@@ -256,7 +256,7 @@ open class LiquidSwipeContainerController: UIViewController {
                 let direction: CGFloat = (gesture.location(in: view).y - mask.waveCenterY).sign == .plus ? 1 : -1
                 let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
                 let centerY = mask.waveCenterY + distance * direction
-                let change = gesture.translation(in: view).x
+                let change = (gesture as? UIPanGestureRecognizer)?.translation(in: view).x ?? self.view.bounds.width * 0.8
                 let maxChange: CGFloat = self.view.bounds.width
                 if !(self.shouldFinish || self.shouldCancel) {
                     let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
@@ -600,7 +600,7 @@ open class LiquidSwipeContainerController: UIViewController {
         currentPage?.pop_add(animation, forKey: "animation")
     }
     
-    @objc private func handleRightSwipe(_ sender: UISwipeGestureRecognizer) {
+    /*@objc private func handleRightSwipe(_ sender: UISwipeGestureRecognizer) {
         animationStartTime = CACurrentMediaTime()
         guard !animating else {
             return
@@ -619,7 +619,7 @@ open class LiquidSwipeContainerController: UIViewController {
             let progress = CGFloat(cTime/self.duration)
             self.animateBack(view: view, forProgress: progress)
             self.animating = progress > 0
-            return self.animating
+            return true
 
         }
         animation?.completionBlock = { (animation, isFinished) in
@@ -627,9 +627,9 @@ open class LiquidSwipeContainerController: UIViewController {
             self.showPreviousPage()
         }
         currentPage?.pop_add(animation, forKey: "animation")
-    }
+    }*/
     
-    /*@objc private func handleRightSwipe(_ sender: UISwipeGestureRecognizer) {
+    @objc private func handleRightSwipe(_ sender: UISwipeGestureRecognizer) {
         guard !animating else {
             return
         }
@@ -654,7 +654,7 @@ open class LiquidSwipeContainerController: UIViewController {
                 let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
                 let centerY = mask.waveCenterY + distance * direction
                 
-                let change: CGFloat = self.view.bounds.width
+                let change: CGFloat = self.view.bounds.width * 0.8
                 let maxChange: CGFloat = self.view.bounds.width
                 let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
                 self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
@@ -712,7 +712,7 @@ open class LiquidSwipeContainerController: UIViewController {
             }
             currentPage?.pop_add(currentViewAnimation, forKey: "animation")
         }
-    }*/
+    }
     
     override open func viewSafeAreaInsetsDidChange() {
         if let mask = self.currentPage?.layer.mask as? WaveLayer {
