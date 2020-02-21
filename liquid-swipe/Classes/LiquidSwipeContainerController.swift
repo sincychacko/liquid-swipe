@@ -627,13 +627,13 @@ open class LiquidSwipeContainerController: UIViewController {
             return self.animating
 
         }
-        if let mask = previousViewController?.view?.layer.mask as? WaveLayer {
-            mask.frame = self.view.bounds
-            mask.updatePath()
-        }
         animation?.completionBlock = { (animation, isFinished) in
             self.animating = false
             self.showPreviousPage()
+        }
+        if let mask = previousViewController?.view?.layer.mask as? WaveLayer {
+            mask.frame = self.view.bounds
+            mask.updatePath()
         }
         previousViewController?.view.pop_add(animation, forKey: "animation")
         
@@ -651,11 +651,11 @@ open class LiquidSwipeContainerController: UIViewController {
             let duration: CGFloat = 0.3
             if !self.shouldCancel {
                 let progress: CGFloat = 1.0 - min(1.0, max(0, CGFloat(time - startTime) / duration))
-                mask.sideWidth = self.initialSideWidth * progress
-                mask.waveHorRadius = self.initialHorRadius * progress
+//                mask.sideWidth = self.initialSideWidth * progress
+//                mask.waveHorRadius = self.initialHorRadius * progress
                 self.csBtnNextLeading?.constant = -(mask.waveHorRadius + mask.sideWidth - 8.0)
                 self.btnNext.transform = CGAffineTransform(scaleX: progress, y: progress)
-                mask.updatePath()
+//                mask.updatePath()
                 switch gesture.state {
                 case .began, .changed:
                     return true
