@@ -623,7 +623,7 @@ open class LiquidSwipeContainerController: UIViewController {
             let distance1 = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
             let centerY1 = mask.waveCenterY + distance1 * direction1
             
-            self.animateBack(view: view, forProgress: 0.5, waveCenterY: centerY1)
+            self.animateBack(view: view, forProgress: 1, waveCenterY: centerY1)
             switch gesture.state {
             case .began, .changed:
                 return true
