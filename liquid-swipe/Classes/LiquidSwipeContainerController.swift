@@ -628,7 +628,7 @@ open class LiquidSwipeContainerController: UIViewController {
             case .began, .changed:
                 return true
             default:
-                self.animationProgress = 0.5
+                self.animationProgress = 1
                 self.animationStartTime = CACurrentMediaTime()
             }
             
