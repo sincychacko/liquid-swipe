@@ -610,21 +610,13 @@ open class LiquidSwipeContainerController: UIViewController {
         if let viewController = previousViewController {
             delegate?.liquidSwipeContainer(self, willTransitionTo: viewController)
         }
-        let animation = POPCustomAnimation {[weak sender] (target, animation) -> Bool in
-            guard let gesture = sender,
-                let view = target as? UIView,
+        let animation = POPCustomAnimation { (target, animation) -> Bool in
+            guard let view = target as? UIView,
                 let mask = view.layer.mask as? WaveLayer,
                 let time = animation?.currentTime else {
                     return false
             }
             let speed: CGFloat = 2000
-            
-            let direction1: CGFloat = (gesture.location(in: view).y - mask.waveCenterY).sign == .plus ? 1 : -1
-            let distance1 = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
-            let centerY1 = mask.waveCenterY + distance1 * direction1
-            
-            self.animateBack(view: view, forProgress: 1, waveCenterY: centerY1)
-            
             
             let cTime = time - (self.animationStartTime ?? CACurrentMediaTime())
             let progress = self.animationProgress - CGFloat(cTime/self.duration)
