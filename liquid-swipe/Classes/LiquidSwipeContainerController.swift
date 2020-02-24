@@ -626,6 +626,10 @@ open class LiquidSwipeContainerController: UIViewController {
             self.animating = false
             self.showPreviousPage()
         }
+        if let mask = previousViewController?.view?.layer.mask as? WaveLayer {
+            mask.frame = self.view.bounds
+            mask.updatePath()
+        }
         previousViewController?.view.pop_add(animation, forKey: "animation")
     }
     
