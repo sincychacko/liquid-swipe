@@ -626,7 +626,7 @@ open class LiquidSwipeContainerController: UIViewController {
             self.animating = false
             self.showPreviousPage()
         }
-        currentPage?.pop_add(animation, forKey: "animation")
+        previousViewController?.view.pop_add(animation, forKey: "animation")
     }
     
     @objc private func handleRightSwipe(_ sender: UISwipeGestureRecognizer) {
