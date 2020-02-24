@@ -610,21 +610,30 @@ open class LiquidSwipeContainerController: UIViewController {
         if let viewController = previousViewController {
             delegate?.liquidSwipeContainer(self, willTransitionTo: viewController)
         }
-        let animation = POPCustomAnimation { (target, animation) -> Bool in
-            guard let view = target as? UIView,
+        let animation = POPCustomAnimation { [weak sender] (target, animation) -> Bool in
+            guard let gesture = sender, let view = target as? UIView,
                 let mask = view.layer.mask as? WaveLayer,
                 let time = animation?.elapsedTime else {
                     return false
             }
             let speed: CGFloat = 2000
             
-            self.animationStartTime = CACurrentMediaTime()
-            let cTime = (animation?.currentTime ?? CACurrentMediaTime()) - (self.animationStartTime ?? CACurrentMediaTime())
-            let progress = self.animationProgress - CGFloat(cTime/self.duration)
-            let direction: CGFloat = (self.initialWaveCenter - mask.waveCenterY).sign == .plus ? 1 : -1
-            let distance = min(CGFloat(time) * speed, abs(self.initialWaveCenter - mask.waveCenterY))
+            let direction: CGFloat = (gesture.location(in: view).y - mask.waveCenterY).sign == .plus ? 1 : -1
+            let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
             let centerY = mask.waveCenterY + distance * direction
+            let change = self.view.bounds.width * 0.8
+            let maxChange: CGFloat = self.view.bounds.width
+            let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
             self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
+            self.animationProgress = progress
+            self.animationStartTime = CACurrentMediaTime()
+            
+            let cTime = (animation?.currentTime ?? CACurrentMediaTime()) - (self.animationStartTime ?? CACurrentMediaTime())
+            let progress1 = self.animationProgress - CGFloat(cTime/self.duration)
+            let direction1: CGFloat = (self.initialWaveCenter - mask.waveCenterY).sign == .plus ? 1 : -1
+            let distance1 = min(CGFloat(time) * speed, abs(self.initialWaveCenter - mask.waveCenterY))
+            let centerY1 = mask.waveCenterY + distance1 * direction1
+            self.animateBack(view: view, forProgress: progress1, waveCenterY: centerY1)
             self.animating = progress >= 0 || abs(self.initialWaveCenter - mask.waveCenterY) > 0.01
             return self.animating
 
