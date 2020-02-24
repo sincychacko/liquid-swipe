@@ -628,7 +628,8 @@ open class LiquidSwipeContainerController: UIViewController {
             let maxChange: CGFloat = self.view.bounds.width
             let progress: CGFloat = min(1.0, max(0, 1 - change / maxChange))
             self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
-            self.animationProgress = progress
+            
+//            self.animationProgress = progress
             self.animationStartTime = CACurrentMediaTime()
             
             let cTime = (animation?.currentTime ?? CACurrentMediaTime()) - (self.animationStartTime ?? CACurrentMediaTime())
