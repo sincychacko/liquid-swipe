@@ -610,20 +610,34 @@ open class LiquidSwipeContainerController: UIViewController {
         if let viewController = previousViewController {
             delegate?.liquidSwipeContainer(self, willTransitionTo: viewController)
         }
-        let animation = POPCustomAnimation { (target, animation) -> Bool in
-            guard let view = target as? UIView,
+        let animation = POPCustomAnimation {[weak sender] (target, animation) -> Bool in
+            guard let gesture = sender, let view = target as? UIView,
                 let mask = view.layer.mask as? WaveLayer,
                 let time = animation?.currentTime else {
                     return false
             }
             let speed: CGFloat = 2000
             
+            let distance1 = CGFloat(animation?.elapsedTime ?? CACurrentMediaTime()) * speed
+            let centerY = mask.waveCenterY + distance1
+            let progress: CGFloat = 0.5
+            self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
+            switch gesture.state {
+            case .began, .changed:
+                return true
+            default:
+                self.animationProgress = progress
+                self.animationStartTime = CACurrentMediaTime()
+            }
+            
+            
             let cTime = time - (self.animationStartTime ?? CACurrentMediaTime())
-            let progress = self.animationProgress - CGFloat(cTime/self.duration)
+            let progress1 = self.animationProgress - CGFloat(cTime/self.duration)
             let direction: CGFloat = (self.initialWaveCenter - mask.waveCenterY).sign == .plus ? 1 : -1
             let distance = min(CGFloat(time) * speed, abs(self.initialWaveCenter - mask.waveCenterY))
-            let centerY = mask.waveCenterY + distance * direction
-            self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
+            let centerY1 = mask.waveCenterY + distance * direction
+            
+            self.animateBack(view: view, forProgress: progress1, waveCenterY: centerY1)
             self.animating = progress >= 0 || abs(self.initialWaveCenter - mask.waveCenterY) > 0.01
             return self.animating
 
