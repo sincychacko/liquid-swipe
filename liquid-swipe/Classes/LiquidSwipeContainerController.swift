@@ -106,7 +106,7 @@ open class LiquidSwipeContainerController: UIViewController {
         rightSwipeGesture.direction = .left
         view.addGestureRecognizer(rightSwipeGesture)
         
-        leftSwipeGesture.addTarget(self, action: #selector(handleRightSwipe))
+        leftSwipeGesture.addTarget(self, action: #selector(h1))
         leftSwipeGesture.direction = .right
         view.addGestureRecognizer(leftSwipeGesture)
         leftSwipeGesture.isEnabled = false
@@ -596,6 +596,34 @@ open class LiquidSwipeContainerController: UIViewController {
         animation?.completionBlock = { (animation, isFinished) in
             self.animating = false
             self.showNextPage()
+        }
+        currentPage?.pop_add(animation, forKey: "animation")
+    }
+    
+    @objc private func h1(_ sender: UISwipeGestureRecognizer) {
+        animationStartTime = CACurrentMediaTime()
+        guard !animating else {
+            return
+        }
+        animating = true
+        previousViewController?.view.isHidden = false
+        if let viewController = previousViewController {
+            delegate?.liquidSwipeContainer(self, willTransitionTo: viewController)
+        }
+        let animation = POPCustomAnimation {(target, animation) -> Bool in
+            guard let view = target as? UIView,
+                let time = animation?.currentTime else {
+                    return false
+            }
+            let cTime = time - (self.animationStartTime ?? CACurrentMediaTime())
+            let progress = CGFloat(cTime/self.duration)
+            self.animateBack(view: view, forProgress: progress)
+            self.animating = progress <= 1.0
+            return progress <= 1.0
+        }
+        animation?.completionBlock = { (animation, isFinished) in
+            self.animating = false
+            self.showPreviousPage()
         }
         currentPage?.pop_add(animation, forKey: "animation")
     }
