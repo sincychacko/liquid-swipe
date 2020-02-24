@@ -621,7 +621,7 @@ open class LiquidSwipeContainerController: UIViewController {
             let direction: CGFloat = (gesture.location(in: view).y - mask.waveCenterY).sign == .plus ? 1 : -1
             let distance = min(CGFloat(time) * speed, abs(mask.waveCenterY - gesture.location(in: view).y))
             let centerY = mask.waveCenterY + distance * direction
-            let progress: CGFloat = 0.9
+            let progress: CGFloat = 1
             self.animateBack(view: view, forProgress: progress, waveCenterY: centerY)
             
             self.animationProgress = progress
@@ -659,19 +659,17 @@ open class LiquidSwipeContainerController: UIViewController {
                     return false
             }
             let duration: CGFloat = 0.3
-            if !self.shouldCancel {
-                let progress: CGFloat = 1.0 - min(1.0, max(0, CGFloat(time - startTime) / duration))
-                mask.sideWidth = self.initialSideWidth * progress
-                mask.waveHorRadius = self.initialHorRadius * progress
-                self.csBtnNextLeading?.constant = -(mask.waveHorRadius + mask.sideWidth - 8.0)
-                self.btnNext.transform = CGAffineTransform(scaleX: progress, y: progress)
-                mask.updatePath()
-                switch gesture.state {
-                case .began, .changed:
-                    return true
-                default:
-                    break
-                }
+            let progress: CGFloat = 1.0 - min(1.0, max(0, CGFloat(time - startTime) / duration))
+            mask.sideWidth = self.initialSideWidth * progress
+            mask.waveHorRadius = self.initialHorRadius * progress
+            self.csBtnNextLeading?.constant = -(mask.waveHorRadius + mask.sideWidth - 8.0)
+            self.btnNext.transform = CGAffineTransform(scaleX: progress, y: progress)
+            mask.updatePath()
+            switch gesture.state {
+            case .began, .changed:
+                return true
+            default:
+                break
             }
             return self.animating
         }
