@@ -656,28 +656,19 @@ open class LiquidSwipeContainerController: UIViewController {
             return
         }
         let startTime = CACurrentMediaTime()
-        let currentViewAnimation = POPCustomAnimation {[weak sender] (target, animation) -> Bool in
-            guard let gesture = sender,
-                let view = target as? UIView,
+        let currentViewAnimation = POPCustomAnimation { (target, animation) -> Bool in
+            guard let view = target as? UIView,
                 let mask = view.layer.mask as? WaveLayer,
                 let time = animation?.currentTime else {
                     return false
             }
             let duration: CGFloat = 0.3
-//            if !self.shouldCancel {
-                let progress: CGFloat = 1.0 - min(1.0, max(0, CGFloat(time - startTime) / duration))
-//                mask.sideWidth = self.initialSideWidth * progress
-//                mask.waveHorRadius = self.initialHorRadius * progress
-                self.csBtnNextLeading?.constant = -(mask.waveHorRadius + mask.sideWidth - 8.0)
-                self.btnNext.transform = CGAffineTransform(scaleX: progress, y: progress)
-//                mask.updatePath()
-                switch gesture.state {
-                case .began, .changed:
-                    return true
-                default:
-                    break
-                }
-//            }
+            let progress: CGFloat = 1.0 - min(1.0, max(0, CGFloat(time - startTime) / duration))
+            mask.sideWidth = self.initialSideWidth * progress
+            mask.waveHorRadius = self.initialHorRadius * progress
+            self.csBtnNextLeading?.constant = -(mask.waveHorRadius + mask.sideWidth - 8.0)
+            self.btnNext.transform = CGAffineTransform(scaleX: progress, y: progress)
+            mask.updatePath()
             return self.animating
         }
         currentPage?.pop_add(currentViewAnimation, forKey: "animation")
