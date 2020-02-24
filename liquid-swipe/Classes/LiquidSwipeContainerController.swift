@@ -616,10 +616,11 @@ open class LiquidSwipeContainerController: UIViewController {
                     return false
             }
             let cTime = time - (self.animationStartTime ?? CACurrentMediaTime())
-            let progress = CGFloat(cTime/self.duration)
+            let progress = self.animationProgress - CGFloat(cTime/self.duration)
             self.animateBack(view: view, forProgress: progress)
             self.animating = progress <= 1.0
             return progress <= 1.0
+
         }
         animation?.completionBlock = { (animation, isFinished) in
             self.animating = false
