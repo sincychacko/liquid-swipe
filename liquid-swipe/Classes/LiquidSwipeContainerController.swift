@@ -652,11 +652,11 @@ open class LiquidSwipeContainerController: UIViewController {
             let duration: CGFloat = 0.3
             if !self.shouldCancel {
                 let progress: CGFloat = 1.0 - min(1.0, max(0, CGFloat(time - startTime) / duration))
-//                mask.sideWidth = self.initialSideWidth * progress
-//                mask.waveHorRadius = self.initialHorRadius * progress
+                mask.sideWidth = self.initialSideWidth * progress
+                mask.waveHorRadius = self.initialHorRadius * progress
                 self.csBtnNextLeading?.constant = -(mask.waveHorRadius + mask.sideWidth - 8.0)
                 self.btnNext.transform = CGAffineTransform(scaleX: progress, y: progress)
-//                mask.updatePath()
+                mask.updatePath()
                 switch gesture.state {
                 case .began, .changed:
                     return true
