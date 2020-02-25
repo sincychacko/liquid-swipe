@@ -113,7 +113,7 @@ open class LiquidSwipeContainerController: UIViewController {
 //        leftSwipeGesture.isEnabled = false
         leftPanEnabled = false
         panGesture.addTarget(self, action: #selector(h1(_:)))
-//        panGesture.delegate = self
+        panGesture.delegate = self
 //        https://stackoverflow.com/questions/29461964/detect-uiscreenedgegesturerecognizer-and-fail-uipangesturerecognizer
         view.addGestureRecognizer(panGesture)
     }
