@@ -66,8 +66,8 @@ open class LiquidSwipeContainerController: UIViewController {
     
     var leftPanEnabled = true
     var rightPanEnabled = true
-//    private var rightEdgeGesture = UIScreenEdgePanGestureRecognizer()
-//    private var leftEdgeGesture = UIScreenEdgePanGestureRecognizer()
+    private var rightEdgeGesture = UIScreenEdgePanGestureRecognizer()
+    private var leftEdgeGesture = UIScreenEdgePanGestureRecognizer()
     private var panGesture = UIPanGestureRecognizer()
 //    private var leftSwipeGesture = PanDirectionGestureRecognizer(direction: .right, target: self, action: #selector(h1(_:)))
     
@@ -95,14 +95,14 @@ open class LiquidSwipeContainerController: UIViewController {
     }
     
     private func configureGestures() {
-//        rightEdgeGesture.addTarget(self, action: #selector(rightEdgePan))
-//        rightEdgeGesture.edges = .right
-//        view.addGestureRecognizer(rightEdgeGesture)
-//
-//        leftEdgeGesture.addTarget(self, action: #selector(leftEdgePan))
-//        leftEdgeGesture.edges = .left
-//        view.addGestureRecognizer(leftEdgeGesture)
-//        leftEdgeGesture.isEnabled = false
+        rightEdgeGesture.addTarget(self, action: #selector(rightEdgePan))
+        rightEdgeGesture.edges = .right
+        view.addGestureRecognizer(rightEdgeGesture)
+
+        leftEdgeGesture.addTarget(self, action: #selector(leftEdgePan))
+        leftEdgeGesture.edges = .left
+        view.addGestureRecognizer(leftEdgeGesture)
+        leftEdgeGesture.isEnabled = false
         
 //        rightSwipeGesture.addTarget(self, action: #selector(h1))
 //        rightSwipeGesture.direction = .left
@@ -422,7 +422,7 @@ open class LiquidSwipeContainerController: UIViewController {
         previousViewController = currentViewController
         currentViewController = nextViewController
         currentPageIndex += 1
-        leftPanEnabled = true
+        leftEdgeGesture.isEnabled = true
 //        leftSwipeGesture.isEnabled = true
         let maskLayer = WaveLayer(waveCenterY: initialWaveCenter,
                                   waveHorRadius: 0,
@@ -436,7 +436,7 @@ open class LiquidSwipeContainerController: UIViewController {
         guard nextViewController != nil else {
             btnNext.isHidden = true
             rightPanEnabled = false
-//            rightSwipeGesture.isEnabled = false
+            rightSwipeGesture.isEnabled = false
             if let viewController = currentViewController {
                 delegate?.liquidSwipeContainer(self, didFinishTransitionTo: viewController, transitionCompleted: true)
             }
@@ -479,7 +479,7 @@ open class LiquidSwipeContainerController: UIViewController {
         currentPageIndex -= 1
         btnNext.isHidden = false
         rightPanEnabled = true
-//        rightSwipeGesture.isEnabled = true
+        rightSwipeGesture.isEnabled = true
         let maskLayer = WaveLayer(waveCenterY: initialWaveCenter,
                                   waveHorRadius: 0,
                                   waveVertRadius: maxVertRadius,
@@ -489,7 +489,7 @@ open class LiquidSwipeContainerController: UIViewController {
         if let prevPage = previousViewController?.view {
             apply(mask: maskLayer, on: prevPage)
         } else {
-            leftPanEnabled = false
+            leftEdgeGesture.isEnabled = false
 //            leftSwipeGesture.isEnabled = false
         }
         let startTime = CACurrentMediaTime()
@@ -526,7 +526,7 @@ open class LiquidSwipeContainerController: UIViewController {
         guard pagesCount > currentPageIndex + 1 else {
             nextViewController = nil
             rightPanEnabled = false
-//            rightSwipeGesture.isEnabled = false
+            rightSwipeGesture.isEnabled = false
             return
         }
         let nextVC = datasource.liquidSwipeContainer(self, viewControllerAtIndex: currentPageIndex + 1)
@@ -553,7 +553,7 @@ open class LiquidSwipeContainerController: UIViewController {
         let pagesCount = datasource.numberOfControllersInLiquidSwipeContainer(self)
         guard currentPageIndex > 0 && pagesCount > 0 else {
             previousViewController = nil
-            leftPanEnabled = false
+            leftEdgeGesture.isEnabled = false
 //            leftSwipeGesture.isEnabled = false
             return
         }
@@ -618,26 +618,15 @@ open class LiquidSwipeContainerController: UIViewController {
         }
         print("horizontal")
         if vel.x > 0 {
-            if leftPanEnabled {
+            if leftEdgeGesture.isEnabled {
                 print("left pan")
-                if let gesture = sender as? UIScreenEdgePanGestureRecognizer {
-                    leftEdgePan(gesture)
-                    return
-                } else {
-                    rightSwipe(sender)
-                }
+                rightSwipe(sender)
             }
             return
         } else {
             print("right pan")
             if rightPanEnabled {
-                if let gesture = sender as? UIScreenEdgePanGestureRecognizer {
-                    rightEdgePan(gesture)
-                    return
-                } else {
-                    btnTapped(sender)
-                    return
-                }
+                btnTapped(sender)
             }
             return
         }
@@ -1196,4 +1185,14 @@ class PanDirectionGestureRecognizer: UIPanGestureRecognizer {
             }
         }
     }
+}
+
+extension LiquidSwipeContainerController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if let _ = otherGestureRecognizer as? UIScreenEdgePanGestureRecognizer {
+            return true
+        }
+        return false
+    }
+    
 }
